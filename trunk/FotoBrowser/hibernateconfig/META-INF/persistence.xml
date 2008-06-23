@@ -1,0 +1,19 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+	version="1.0">
+	<persistence-unit name="fotobrowser" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<!-- <jta-data-source>jdbc/foto</jta-data-source>  -->
+		<properties>
+			<property name="hibernate.connection.driver_class" value="org.postgresql.Driver" />
+			<property name="hibernate.connection.url" value="jdbc:postgresql://matrix/fotobrowser" />
+			<property name="hibernate.connection.username" value="hacker" />
+			<property name="hibernate.connection.password" value="linux" />
+			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
+			<property name="hibernate.hbm2ddl.auto" value="validate" />
+			<property name="current_session_context_class" value="thread" />
+			<!--  create, update, create-drop,validate -->
+		</properties>
+	</persistence-unit>
+</persistence>
