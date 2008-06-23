@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp codebase="$URL" href="$JNLP_FILENAME">
+	<information>
+		<title>$TITLE</title>
+		<vendor>$VENTOR</vendor>
+		<homepage href="$URL" />
+		<description>$DESCRIPTION</description>
+		<icon href="$ICON"/>
+		<shortcut online="false">
+			<desktop/>
+			<menu submenu="$MENU" />
+		</shortcut>
+	</information>
+    <security>
+	   	<all-permissions/>
+    </security>
+
+	<resources>
+		<j2se href="http://java.sun.com/products/autodl/j2se" version="1.6*" initial-heap-size="128M" max-heap-size="800M" />
+		<jar href="$URL/$JAR" main="true"/>
+	</resources>
+
+	<application-desc main-class="$MAINCLASS"/>
+
+</jnlp>

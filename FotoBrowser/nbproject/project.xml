@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <name>FotoBrowser</name>
+        </general-data>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/2">
+            <!-- Do not use Project Properties customizer when editing this file manually. -->
+            <name>FotoBrowser</name>
+            <properties/>
+            <folders>
+                <source-folder>
+                    <label>FotoBrowser</label>
+                    <location>.</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>src</label>
+                    <type>java</type>
+                    <location>src</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <target>build</target>
+                </action>
+                <action name="clean">
+                    <target>clean</target>
+                </action>
+                <action name="run">
+                    <target>run</target>
+                </action>
+                <action name="rebuild">
+                    <target>clean</target>
+                    <target>build</target>
+                </action>
+            </ide-actions>
+            <view>
+                <items>
+                    <source-folder style="packages">
+                        <label>src</label>
+                        <location>src</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="clean"/>
+                    <ide-action name="run"/>
+                </context-menu>
+            </view>
+            <subprojects>
+                <project>/Users/mac/Documents/workspace/eclipsesJava</project>
+            </subprojects>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/1">
+            <compilation-unit>
+                <package-root>src</package-root>
+                <classpath mode="compile">/Users/mac/Documents/workspace/eclipsesJava/dist/eclipsesJava.jar:/Users/mac/Documents/workspace/jar/tomcatlibs/catalina-ant.jar:/Users/mac/Documents/workspace/jar/tomcatlibs/servlet-api.jar:WebContent/WEB-INF/lib/antlr-2.7.6.jar:WebContent/WEB-INF/lib/asm-attrs.jar:WebContent/WEB-INF/lib/asm.jar:WebContent/WEB-INF/lib/c3p0-0.9.1.jar:WebContent/WEB-INF/lib/cglib-2.1.3.jar:WebContent/WEB-INF/lib/commons-codec-1.3.jar:WebContent/WEB-INF/lib/commons-collections-3.2.jar:WebContent/WEB-INF/lib/commons-httpclient-3.1-rc1.jar:WebContent/WEB-INF/lib/commons-lang-2.3.jar:WebContent/WEB-INF/lib/commons-logging-1.1.jar:WebContent/WEB-INF/lib/dom4j-1.6.1.jar:WebContent/WEB-INF/lib/ejb3-persistence.jar:WebContent/WEB-INF/lib/fast-md5.jar:WebContent/WEB-INF/lib/hibernate-annotations.jar:WebContent/WEB-INF/lib/hibernate-commons-annotations.jar:WebContent/WEB-INF/lib/hibernate-entitymanager.jar:WebContent/WEB-INF/lib/hibernate3.jar:WebContent/WEB-INF/lib/javassist.jar:WebContent/WEB-INF/lib/jdom-1.1.jar:WebContent/WEB-INF/lib/jta.jar:WebContent/WEB-INF/lib/junit-4.1.jar:WebContent/WEB-INF/lib/log4j-1.2.14.jar:WebContent/WEB-INF/lib/postgresql-8.3-603.jdbc3.jar:WebContent/WEB-INF/lib/quartz-all-1.6.0.jar</classpath>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+        </java-data>
+    </configuration>
+</project>

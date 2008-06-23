@@ -1,0 +1,219 @@
+<?xml version="1.0"?>
+<project default="build" basedir=".">
+	<description></description>
+	<property file="mybuild.properties" />
+	<echo message="basedir : ${basedir}" />
+	<echo message="jar.file : ${jar.file}" />
+	<echo message="dist.classname : ${dist.classname}" />
+
+	<patternset id="fileresources">
+		<include name="**/*.png" />
+		<include name="**/*.gif" />
+		<include name="**/*.ico" />
+		<include name="**/*.jpg" />
+		<include name="**/*.jpeg" />
+		<include name="**/*.svg" />
+		<include name="**/*.xml" />
+		<include name="**/*.properties" />
+		<include name="**/*.html" />
+
+		<exclude name="**/.svn" />
+	</patternset>
+
+	<!-- Basics -->
+
+	<property name="src.dir" value="src" />
+	<property name="build.dir" value="build" />
+	<property name="dist.dir" value="dist" />
+
+	<!-- Building -->
+	<!-- PROPERTIES <property name="jar.file" value="jens.jar" />  -->
+	<property name="jar.file.small" value="prg.jar" />
+
+
+	<import file="${basedir}/../eclipsesJava/build.eclipse.xml" />
+
+	<!-- Tomcat/ApplicationServer -->
+	<property file="appserver.properties" />
+	<import file="${basedir}/../jar/tomcatlibs/build.tomcat.xml" />
+
+	<!-- ClassPath -->
+	<path id="classpath-lib">
+		<!-- Eigentlich nur für EclipsesJava -->
+		<pathelement location="${build.dir}" />
+
+		<fileset dir="lib">
+			<include name="*.jar" />
+		</fileset>
+
+		<fileset dir="WebContent/WEB-INF/lib">
+			<include name="*.jar" />
+		</fileset>
+
+		<path refid="eclipse-lib">
+		</path>
+		<path refid="tomcat-lib" />
+		<!--
+				Eigene Libs :
+			   <pathelement location="../lib/httpunit.jar"/>
+			   <pathelement location="../lib/Tidy.jar"/>
+			   <pathelement location="../lib/xerces.jar"/>
+			-->
+	</path>
+
+	<target name="initProject">
+		<echo level="warning" message="Kopiere basis-jars nach lib" />
+		<mkdir dir="${basedir}/lib" />
+		<copy file="${basedir}/../jar/apache/commons/logging/commons-logging-1.1.jar" todir="lib" />
+		<copy file="${basedir}/../jar/apache/log4j-1.2.14.jar" todir="lib" />
+		<copy file="${basedir}/../jar/junit/junit-4.1.jar" todir="lib" />
+		<!--
+			<copy file="${basedir}/../jar/mysql/mysql-connector-java-5.0.6-bin.jar" todir="lib" />
+			<copy file="${basedir}/../jar/jtds/jtds-1.2.2.jar" todir="lib" />
+			<copy file="${basedir}/../jar/postgres/postgresql-8.2-506.jdbc3.jar" todir="lib" />
+			-->
+	</target>
+
+	<!-- Hibernate -->
+	<import file="${basedir}/../eclipsesJava/buildScripts/hibernate.xml" />
+	<target name="hibernate" depends="prepare,copyImages">
+		<hibernatetool destdir="${src.dir}">
+			<classpath refid="hibernate-libs" />
+			<jdbcconfiguration configurationfile="${hibernate.cfgdir}/hibernate.cfg.xml" packagename="org.jens.fotobrowser.model.hibernate" revengfile="${hibernate.cfgdir}/hibernate.rev.xml" detectmanytomany="true" detectoptimisticlock="true" />
+			<hbm2java jdk5="true" ejb3="true" />
+		</hibernatetool>
+	</target>
+
+
+	<target name="clean" description="Cleans up">
+		<delete dir="${dist.dir}" />
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="build" depends="buildEclipsesJava,copyImages" description="build the project">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" encoding="UTF-8" debug="true" classpathref="classpath-lib">
+			<include name="**/*.java" />
+			<!-- <compilerarg value="-Xlint:unchecked"/>-->
+		</javac>
+	</target>
+
+	<target name="wsgen" depends="build" description="Benoetigte WS Stubs erzeugen">
+		<exec executable="wsgen">
+			<arg value="-verbose" />
+			<arg value="-d" />
+			<arg value="${build.dir}" />
+			<arg value="-cp"/>
+			<arg value="${build.dir}" />
+			<arg value="org.jens.fotoBrowser.Model" />
+		</exec>
+	</target>
+
+	<target name="deployGlassfish" depends="war">
+		<copy file="${dist.dir}/${deploy.war}" todir="/home/ftp/pub/java/glassfish/domains/domain1/autodeploy" />
+	</target>
+
+	<target name="copyImages" depends="prepare,copyPersistConfig" description="">
+		<copy todir="${build.dir}">
+			<fileset dir="${src.dir}">
+				<patternset refid="fileresources" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="jar_small" depends="build">
+		<jar destfile="${dist.dir}/${jar.file.small}">
+			<manifest>
+				<attribute name="Main-Class" value="${dist.classname}" />
+			</manifest>
+			<fileset dir="${build.dir}">
+				<patternset refid="fileresources" />
+				<include name="**/*.class" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="jar" depends="jar_small" description="Makes a jar from the build">
+		<!-- Merge the Others ... -->
+		<zip duplicate="preserve" destfile="${dist.dir}/${jar.file}">
+			<zipfileset src="${dist.dir}/${jar.file.small}" />
+			<zipgroupfileset dir="WebContent/WEB-INF/lib" includes="*.jar"/>
+		</zip>
+	</target>
+
+
+	<target name="signJar" depends="jar" description="signJar">
+		<signjar jar="${dist.dir}/${jar.file}" signedjar="${dist.dir}/${jar.signed.file}" storepass="${jar.signed.storepass}" keypass="${jar.signed.keypass}" alias="${jar.signed.alias}" />
+	</target>
+
+	<target name="webstart" depends="signJar">
+		<copy file="data/start.jnlp.xml" tofile="${dist.dir}/${webstart.filename}" />
+		<replace file="${dist.dir}/${webstart.filename}" value="${dist.version}">
+			<replacetoken>$VERSION</replacetoken>
+		</replace>
+		<replace file="${dist.dir}/${webstart.filename}" value="${webstart.url}">
+			<replacetoken>$URL</replacetoken>
+		</replace>
+		<replace file="${dist.dir}/${webstart.filename}" value="${dist.classname}">
+			<replacetoken>$MAINCLASS</replacetoken>
+		</replace>
+		<replace file="${dist.dir}/${webstart.filename}" value="${webstart.filename}">
+			<replacetoken>$JNLP_FILENAME</replacetoken>
+		</replace>
+		<replace file="${dist.dir}/${webstart.filename}" value="${webstart.title}">
+			<replacetoken>$TITLE</replacetoken>
+		</replace>
+		<replace file="${dist.dir}/${webstart.filename}" value="${webstart.vendor}">
+			<replacetoken>$VENTOR</replacetoken>
+		</replace>
+		<replace file="${dist.dir}/${webstart.filename}" value="${webstart.description}">
+			<replacetoken>$DESCRIPTION</replacetoken>
+		</replace>
+		<replace file="${dist.dir}/${webstart.filename}" value="${webstart.menu}">
+			<replacetoken>$MENU</replacetoken>
+		</replace>
+		<replace file="${dist.dir}/${webstart.filename}" value="${jar.signed.file}">
+			<replacetoken>$JAR</replacetoken>
+		</replace>
+		<!-- <copy file="data/webstart.png" tofile="${dist.dir}/webstart.png" /> -->
+	</target>
+
+	<target name="war" depends="build,wsgen" description="WAR erzeugen">
+		<war destfile="${dist.dir}/${deploy.war}" webxml="WebContent/WEB-INF/web.xml">
+			<fileset dir="WebContent/">
+				<exclude name="**/web.xml" />
+			</fileset>
+			<classes dir="${build.dir}">
+				<include name="**/*.class" />
+				<patternset refid="fileresources" />
+				<!-- <exclude name="**/ejb*"/> -->
+			</classes>
+			<fileset dir="${dist.dir}" includes="${jar.signed.file}" />
+			<fileset dir="${dist.dir}" includes="${webstart.filename}" />
+		</war>
+	</target>
+
+	<target name="run" depends="jar" description="Run MainClass">
+		<java fork="true" classname="${dist.classname}" classpath="${dist.dir}/${jar.file}" />
+	</target>
+
+	<path id="cpr">
+			<pathelement path="${dist.classname}"/>
+			<pathelement path="${dist.dir}/${jar.file}"/>
+			<fileset dir="WebContent/WEB-INF/lib">
+				<include name="**/*.jar"/>
+			</fileset>
+		</path>
+
+		<target name="updateRss" depends="signJar" description="updatesDB">
+			<java fork="true" classname="org.jens.fotoBrowser.Model" classpathref="cpr" />
+		</target>
+
+		<target name="zip" depends="signJar" description="updatesDB">
+				<java fork="true" classname="org.jens.fotoBrowser.CLIJar" classpathref="cpr" />
+		</target>
+
+		<target name="deploy" depends="war, TomcatStop, TomcatUndeploy, TomcatDeploy">
+			<echo message="deployed" />
+		</target>
+
+</project>
